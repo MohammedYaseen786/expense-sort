@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statement Sorter · Sign in</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/icon.ico" sizes="any">
+<link rel="icon" href="/icon-192.png" type="image/png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#20301F">
+<style>
+.auth-card{ max-width:400px; margin:60px auto 0 auto; padding:24px 26px; }
+.auth-card h2{
+  font-family:'Special Elite', monospace; font-size:15px; margin:0 0 16px 0;
+  color:var(--brass); text-transform:uppercase; letter-spacing:1px;
+}
+.auth-card form{ display:flex; flex-direction:column; gap:12px; }
+.auth-card .tag-field input{ width:100%; }
+.auth-card .btn{ margin-top:4px; }
+.auth-card .switch{ font-size:12.5px; color:var(--ink-soft); margin-top:14px; }
+.auth-card .switch a{ color:var(--brass); }
+.auth-card .hint{ font-size:11.5px; color:var(--ink-soft); margin-top:12px; line-height:1.5; }
+.auth-card label.cr{ font-size:12.5px; display:flex; gap:6px; align-items:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <h1>Statement Sorter</h1>
+    <div class="tagline">upload &middot; read &middot; categorise &middot; tally</div>
+  </header>
+
+  <section class="panel auth-card">
+    <h2 id="heading">Sign in</h2>
+    <form id="authForm">
+      <label class="tag-field">
+        <span class="tag-field-label">Email</span>
+        <input type="text" name="email" autocomplete="username" required>
+      </label>
+      <label class="tag-field">
+        <span class="tag-field-label">Password</span>
+        <input type="password" name="password" autocomplete="current-password" required minlength="6">
+      </label>
+      <button class="btn" type="submit" id="submitBtn">Sign in</button>
+      <div class="status-line" id="statusLine"></div>
+    </form>
+    <div class="switch" id="switchLine"></div>
+    <p class="hint">Your account and data are stored only on this computer, in the app's <code>data</code> folder.</p>
+  </section>
+</div>
+
+<script>
+const signup = location.pathname === '/signup';
+const form = document.getElementById('authForm');
+const statusLine = document.getElementById('statusLine');
+const submitBtn = document.getElementById('submitBtn');
+
+document.getElementById('heading').textContent = signup ? 'Create an account' : 'Sign in';
+submitBtn.textContent = signup ? 'Create account' : 'Sign in';
+form.password.autocomplete = signup ? 'new-password' : 'current-password';
+document.getElementById('switchLine').innerHTML = signup
+  ? 'Already have an account? <a href="/login">Sign in</a>'
+  : 'No account yet? <a href="/signup">Create one</a>';
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  submitBtn.disabled = true;
+  statusLine.textContent = '';
+  statusLine.className = 'status-line';
+  try {
+    const res = await fetch(signup ? '/api/auth/signup' : '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: form.email.value,
+        password: form.password.value,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+    location.href = '/';
+  } catch (err) {
+    statusLine.textContent = err.message;
+    statusLine.className = 'status-line err';
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

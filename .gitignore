@@ -1,0 +1,5 @@
+/node_modules
+# local database, logs and backups: your financial data never gets committed
+/data
+npm-debug.log*
+.DS_Store

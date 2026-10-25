@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statement Sorter</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/icon.ico" sizes="any">
+<link rel="icon" href="/icon-192.png" type="image/png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#20301F">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Statement Sorter</h1>
+    <div>
+      <div class="tagline">upload &middot; read &middot; categorise &middot; tally</div>
+      <div class="save-row">
+        <span class="user-email" id="userEmail"></span>
+        <button class="btn small ghost" id="logoutBtn">Sign out</button>
+        <div class="save-indicator" id="saveIndicator"></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="panel intake">
+    <h2>Add transactions</h2>
+    <p class="preloaded-note" id="preloadedNote" hidden></p>
+
+    <div class="tag-field-row">
+      <div class="tag-field">
+        <span class="tag-field-label">Account (tag for new uploads)</span>
+        <input type="text" id="accountTagInput" value="Credit Card" list="accountList">
+        <datalist id="accountList"></datalist>
+      </div>
+      <div class="tag-field">
+        <span class="tag-field-label">Year (for dates like "25 Jun")</span>
+        <input type="number" id="yearInput" value="2026" min="2000" max="2100">
+      </div>
+      <div class="tag-field">
+        <span class="tag-field-label">Currency symbol</span>
+        <input type="text" id="currencySymbol" value="R" maxlength="3" style="min-width:60px;">
+      </div>
+    </div>
+
+    <div class="intake-row">
+      <label class="dropzone-file" id="dropzoneFile">
+        <strong id="dzLabel">Drop a PDF here, or click to choose a file</strong>
+        <span>New transactions are added to the pool, tagged with the account above</span>
+        <input type="file" id="fileInput" accept="application/pdf">
+      </label>
+    </div>
+    <button class="paste-toggle" id="pasteToggle">or paste statement text instead &rarr;</button>
+    <div class="paste-area" id="pasteArea">
+      <textarea id="pasteText" placeholder="Paste the transaction lines from your statement here, e.g.&#10;25 Jun City Garage Express Johannesburg ZA 19.00&#10;07 Jul ShopNow Online London GB 249.00Cr"></textarea>
+      <button class="btn small" id="parsePasteBtn">Read transactions</button>
+    </div>
+    <div class="status-line" id="statusLine"></div>
+
+    <div class="manual-form" id="manualForm">
+      <input type="date" name="date">
+      <input type="text" name="desc" placeholder="Description">
+      <input type="text" name="amount" placeholder="Amount">
+      <label class="cr"><input type="checkbox" name="isCredit"> Credit</label>
+      <button class="btn small" id="manualAddBtn">Add</button>
+      <button class="btn ghost small" id="manualCancelBtn">Cancel</button>
+    </div>
+
+    <div class="backup-row">
+      <button class="btn ghost small" id="manualToggleBtn">+ Add a transaction manually</button>
+      <button class="btn ghost small" id="restoreOriginalBtn" hidden>Restore original transactions</button>
+      <button class="btn ghost small" id="resetCategoriesBtn">Reset categories in current view</button>
+      <button class="btn ghost small" id="clearAllBtn">Clear ALL data &amp; start fresh</button>
+    </div>
+    <div class="backup-row">
+      <span class="tag-field-label" style="align-self:center;">Backup to file</span>
+      <a class="btn small ghost" id="exportBtn" href="/api/export?format=json" download>Export everything (JSON)</a>
+      <a class="btn small ghost" id="exportCsvBtn" href="/api/export?format=csv" download>Export current view (CSV)</a>
+      <label class="btn small ghost" id="importLabel" style="cursor:pointer;">
+        Import file
+        <input type="file" id="importInput" accept="application/json" style="display:none;">
+      </label>
+    </div>
+  </section>
+
+  <section class="panel filter-panel">
+    <h2>Filter what you're sorting</h2>
+    <div class="tag-field-row" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+      <div class="tag-field">
+        <span class="tag-field-label">From</span>
+        <input type="date" id="filterFrom">
+      </div>
+      <div class="tag-field">
+        <span class="tag-field-label">To</span>
+        <input type="date" id="filterTo">
+      </div>
+      <div class="tag-field">
+        <button class="btn small" id="clearFilterBtn">Show everything</button>
+      </div>
+    </div>
+    <div class="month-chips" id="monthChips"></div>
+    <div class="filter-summary" id="filterSummary"></div>
+  </section>
+
+  <section class="board">
+    <div class="panel unsorted-panel">
+      <div class="unsorted-head">
+        <h2>Unsorted</h2>
+        <span class="unsorted-total" id="unsortedTotal">R0.00</span>
+      </div>
+      <div class="txn-list" id="txnList"></div>
+    </div>
+
+    <div class="categories" id="categories"></div>
+  </section>
+
+  <div class="panel summary-strip" id="summaryStrip"></div>
+
+</div>
+
+<script src="/vendor/pdf.min.js"></script>
+<script src="/pdf-lines.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
